@@ -1,0 +1,1577 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ShieldCore - AI Security Platform</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: #0a0a0f;
+            color: #e0e0e0;
+            min-height: 100vh;
+            overflow-x: hidden;
+        }
+
+        /* Background Animation */
+        .bg-grid {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-image: 
+                linear-gradient(rgba(0, 255, 136, 0.03) 1px, transparent 1px),
+                linear-gradient(90deg, rgba(0, 255, 136, 0.03) 1px, transparent 1px);
+            background-size: 50px 50px;
+            pointer-events: none;
+            z-index: -1;
+        }
+
+        .particles {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            pointer-events: none;
+            z-index: -1;
+        }
+
+        .particle {
+            position: absolute;
+            width: 2px;
+            height: 2px;
+            background: #00ff88;
+            border-radius: 50%;
+            opacity: 0.5;
+            animation: float 10s infinite;
+        }
+
+        @keyframes float {
+            0%, 100% { transform: translateY(0) translateX(0); opacity: 0; }
+            10% { opacity: 0.5; }
+            90% { opacity: 0.5; }
+            100% { transform: translateY(-100vh) translateX(50px); }
+        }
+
+        /* Header */
+        .header {
+            background: rgba(10, 10, 15, 0.95);
+            backdrop-filter: blur(10px);
+            border-bottom: 1px solid rgba(0, 255, 136, 0.2);
+            padding: 1rem 2rem;
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            z-index: 1000;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .logo {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            font-size: 1.5rem;
+            font-weight: bold;
+            color: #00ff88;
+            text-decoration: none;
+        }
+
+        .logo-icon {
+            width: 40px;
+            height: 40px;
+            background: linear-gradient(135deg, #00ff88, #00ccff);
+            border-radius: 10px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: #000;
+        }
+
+        .nav-links {
+            display: flex;
+            gap: 2rem;
+            align-items: center;
+        }
+
+        .nav-links a {
+            color: #888;
+            text-decoration: none;
+            transition: color 0.3s;
+            font-size: 0.9rem;
+        }
+
+        .nav-links a:hover {
+            color: #00ff88;
+        }
+
+        .user-menu {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+        }
+
+        .balance {
+            background: rgba(0, 255, 136, 0.1);
+            border: 1px solid rgba(0, 255, 136, 0.3);
+            padding: 0.5rem 1rem;
+            border-radius: 20px;
+            color: #00ff88;
+            font-size: 0.9rem;
+        }
+
+        .btn {
+            padding: 0.7rem 1.5rem;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 0.9rem;
+            transition: all 0.3s;
+            text-decoration: none;
+            display: inline-block;
+        }
+
+        .btn-primary {
+            background: linear-gradient(135deg, #00ff88, #00ccff);
+            color: #000;
+            font-weight: bold;
+        }
+
+        .btn-primary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 20px rgba(0, 255, 136, 0.4);
+        }
+
+        .btn-outline {
+            background: transparent;
+            border: 1px solid #00ff88;
+            color: #00ff88;
+        }
+
+        .btn-outline:hover {
+            background: rgba(0, 255, 136, 0.1);
+        }
+
+        .btn-danger {
+            background: rgba(255, 68, 68, 0.2);
+            border: 1px solid #ff4444;
+            color: #ff4444;
+        }
+
+        /* Main Content */
+        .main-content {
+            margin-top: 80px;
+            padding: 2rem;
+            max-width: 1400px;
+            margin-left: auto;
+            margin-right: auto;
+        }
+
+        /* Auth Pages */
+        .auth-container {
+            min-height: calc(100vh - 80px);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 2rem;
+        }
+
+        .auth-box {
+            background: rgba(20, 20, 30, 0.8);
+            border: 1px solid rgba(0, 255, 136, 0.2);
+            border-radius: 15px;
+            padding: 3rem;
+            width: 100%;
+            max-width: 450px;
+            backdrop-filter: blur(10px);
+        }
+
+        .auth-title {
+            font-size: 2rem;
+            margin-bottom: 0.5rem;
+            text-align: center;
+            background: linear-gradient(135deg, #00ff88, #00ccff);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        .auth-subtitle {
+            text-align: center;
+            color: #666;
+            margin-bottom: 2rem;
+        }
+
+        .form-group {
+            margin-bottom: 1.5rem;
+        }
+
+        .form-group label {
+            display: block;
+            margin-bottom: 0.5rem;
+            color: #aaa;
+            font-size: 0.9rem;
+        }
+
+        .form-group input {
+            width: 100%;
+            padding: 1rem;
+            background: rgba(0, 0, 0, 0.3);
+            border: 1px solid rgba(0, 255, 136, 0.2);
+            border-radius: 8px;
+            color: #fff;
+            font-size: 1rem;
+            transition: border-color 0.3s;
+        }
+
+        .form-group input:focus {
+            outline: none;
+            border-color: #00ff88;
+        }
+
+        .form-group input.error {
+            border-color: #ff4444;
+        }
+
+        .error-message {
+            color: #ff4444;
+            font-size: 0.8rem;
+            margin-top: 0.3rem;
+            display: none;
+        }
+
+        .auth-footer {
+            text-align: center;
+            margin-top: 2rem;
+            color: #666;
+        }
+
+        .auth-footer a {
+            color: #00ff88;
+            text-decoration: none;
+        }
+
+        /* Dashboard */
+        .dashboard-header {
+            margin-bottom: 2rem;
+        }
+
+        .dashboard-header h1 {
+            font-size: 2rem;
+            margin-bottom: 0.5rem;
+        }
+
+        .dashboard-header p {
+            color: #666;
+        }
+
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 1.5rem;
+            margin-bottom: 2rem;
+        }
+
+        .stat-card {
+            background: rgba(20, 20, 30, 0.6);
+            border: 1px solid rgba(0, 255, 136, 0.2);
+            border-radius: 12px;
+            padding: 1.5rem;
+            transition: transform 0.3s;
+        }
+
+        .stat-card:hover {
+            transform: translateY(-5px);
+            border-color: rgba(0, 255, 136, 0.4);
+        }
+
+        .stat-label {
+            color: #888;
+            font-size: 0.9rem;
+            margin-bottom: 0.5rem;
+        }
+
+        .stat-value {
+            font-size: 2rem;
+            font-weight: bold;
+            color: #00ff88;
+        }
+
+        .stat-change {
+            font-size: 0.8rem;
+            color: #00ff88;
+            margin-top: 0.5rem;
+        }
+
+        /* Projects Section */
+        .section {
+            background: rgba(20, 20, 30, 0.6);
+            border: 1px solid rgba(0, 255, 136, 0.2);
+            border-radius: 12px;
+            padding: 2rem;
+            margin-bottom: 2rem;
+        }
+
+        .section-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 1.5rem;
+        }
+
+        .section-title {
+            font-size: 1.3rem;
+            color: #fff;
+        }
+
+        .projects-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+            gap: 1.5rem;
+        }
+
+        .project-card {
+            background: rgba(0, 0, 0, 0.3);
+            border: 1px solid rgba(0, 255, 136, 0.1);
+            border-radius: 10px;
+            padding: 1.5rem;
+            transition: all 0.3s;
+        }
+
+        .project-card:hover {
+            border-color: rgba(0, 255, 136, 0.3);
+            transform: translateY(-3px);
+        }
+
+        .project-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: start;
+            margin-bottom: 1rem;
+        }
+
+        .project-name {
+            font-weight: bold;
+            color: #fff;
+            margin-bottom: 0.3rem;
+        }
+
+        .project-url {
+            color: #666;
+            font-size: 0.85rem;
+        }
+
+        .project-status {
+            padding: 0.3rem 0.8rem;
+            border-radius: 20px;
+            font-size: 0.75rem;
+            font-weight: bold;
+        }
+
+        .status-secure {
+            background: rgba(0, 255, 136, 0.2);
+            color: #00ff88;
+        }
+
+        .status-warning {
+            background: rgba(255, 170, 0, 0.2);
+            color: #ffaa00;
+        }
+
+        .status-danger {
+            background: rgba(255, 68, 68, 0.2);
+            color: #ff4444;
+        }
+
+        .project-stats {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 1rem;
+            margin-top: 1rem;
+            padding-top: 1rem;
+            border-top: 1px solid rgba(255, 255, 255, 0.05);
+        }
+
+        .project-stat {
+            text-align: center;
+        }
+
+        .project-stat-value {
+            font-size: 1.2rem;
+            font-weight: bold;
+            color: #fff;
+        }
+
+        .project-stat-label {
+            font-size: 0.75rem;
+            color: #666;
+        }
+
+        /* Pricing Section */
+        .pricing-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 2rem;
+            margin-top: 2rem;
+        }
+
+        .pricing-card {
+            background: rgba(20, 20, 30, 0.8);
+            border: 2px solid rgba(0, 255, 136, 0.2);
+            border-radius: 15px;
+            padding: 2rem;
+            position: relative;
+            transition: all 0.3s;
+        }
+
+        .pricing-card:hover {
+            transform: translateY(-10px);
+            border-color: rgba(0, 255, 136, 0.5);
+        }
+
+        .pricing-card.featured {
+            border-color: #00ff88;
+            transform: scale(1.05);
+        }
+
+        .pricing-card.featured:hover {
+            transform: scale(1.05) translateY(-10px);
+        }
+
+        .pricing-badge {
+            position: absolute;
+            top: -10px;
+            right: 20px;
+            background: linear-gradient(135deg, #00ff88, #00ccff);
+            color: #000;
+            padding: 0.3rem 1rem;
+            border-radius: 20px;
+            font-size: 0.8rem;
+            font-weight: bold;
+        }
+
+        .pricing-name {
+            font-size: 1.5rem;
+            margin-bottom: 0.5rem;
+        }
+
+        .pricing-price {
+            font-size: 3rem;
+            font-weight: bold;
+            color: #00ff88;
+            margin-bottom: 0.5rem;
+        }
+
+        .pricing-price span {
+            font-size: 1rem;
+            color: #666;
+        }
+
+        .pricing-description {
+            color: #888;
+            margin-bottom: 1.5rem;
+            min-height: 40px;
+        }
+
+        .pricing-features {
+            list-style: none;
+            margin-bottom: 2rem;
+        }
+
+        .pricing-features li {
+            padding: 0.5rem 0;
+            color: #aaa;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .pricing-features li::before {
+            content: "✓";
+            color: #00ff88;
+            font-weight: bold;
+        }
+
+        .pricing-features li.disabled {
+            color: #555;
+            text-decoration: line-through;
+        }
+
+        .pricing-features li.disabled::before {
+            content: "✗";
+            color: #555;
+        }
+
+        /* Modal */
+        .modal-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(0, 0, 0, 0.8);
+            backdrop-filter: blur(5px);
+            display: none;
+            align-items: center;
+            justify-content: center;
+            z-index: 2000;
+            padding: 2rem;
+        }
+
+        .modal-overlay.active {
+            display: flex;
+        }
+
+        .modal {
+            background: #1a1a2e;
+            border: 1px solid rgba(0, 255, 136, 0.3);
+            border-radius: 15px;
+            max-width: 600px;
+            width: 100%;
+            max-height: 90vh;
+            overflow-y: auto;
+        }
+
+        .modal-header {
+            padding: 1.5rem;
+            border-bottom: 1px solid rgba(0, 255, 136, 0.2);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .modal-title {
+            font-size: 1.3rem;
+            color: #fff;
+        }
+
+        .modal-close {
+            background: none;
+            border: none;
+            color: #666;
+            font-size: 1.5rem;
+            cursor: pointer;
+        }
+
+        .modal-close:hover {
+            color: #fff;
+        }
+
+        .modal-body {
+            padding: 1.5rem;
+        }
+
+        .modal-footer {
+            padding: 1.5rem;
+            border-top: 1px solid rgba(0, 255, 136, 0.2);
+            display: flex;
+            justify-content: flex-end;
+            gap: 1rem;
+        }
+
+        /* Offer Agreement */
+        .offer-box {
+            background: rgba(255, 170, 0, 0.1);
+            border: 1px solid rgba(255, 170, 0, 0.3);
+            border-radius: 8px;
+            padding: 1.5rem;
+            margin-bottom: 1.5rem;
+            max-height: 300px;
+            overflow-y: auto;
+        }
+
+        .offer-box h4 {
+            color: #ffaa00;
+            margin-bottom: 1rem;
+        }
+
+        .offer-box p, .offer-box li {
+            color: #aaa;
+            font-size: 0.9rem;
+            line-height: 1.6;
+            margin-bottom: 0.5rem;
+        }
+
+        .offer-box ul {
+            margin-left: 1.5rem;
+        }
+
+        .checkbox-group {
+            display: flex;
+            align-items: start;
+            gap: 0.5rem;
+            margin-top: 1rem;
+        }
+
+        .checkbox-group input[type="checkbox"] {
+            width: 20px;
+            height: 20px;
+            margin-top: 2px;
+            accent-color: #00ff88;
+        }
+
+        .checkbox-group label {
+            color: #ccc;
+            font-size: 0.9rem;
+            line-height: 1.4;
+        }
+
+        .checkbox-group label strong {
+            color: #ffaa00;
+        }
+
+        /* Scanner */
+        .scanner-container {
+            background: rgba(0, 0, 0, 0.3);
+            border-radius: 10px;
+            padding: 2rem;
+            margin-bottom: 2rem;
+        }
+
+        .scanner-input-group {
+            display: flex;
+            gap: 1rem;
+            margin-bottom: 1.5rem;
+        }
+
+        .scanner-input {
+            flex: 1;
+            padding: 1rem;
+            background: rgba(0, 0, 0, 0.3);
+            border: 1px solid rgba(0, 255, 136, 0.2);
+            border-radius: 8px;
+            color: #fff;
+            font-size: 1rem;
+        }
+
+        .scanner-progress {
+            display: none;
+            margin-top: 1.5rem;
+        }
+
+        .scanner-progress.active {
+            display: block;
+        }
+
+        .progress-bar {
+            height: 8px;
+            background: rgba(0, 0, 0, 0.3);
+            border-radius: 4px;
+            overflow: hidden;
+            margin-bottom: 1rem;
+        }
+
+        .progress-fill {
+            height: 100%;
+            background: linear-gradient(90deg, #00ff88, #00ccff);
+            width: 0%;
+            transition: width 0.3s;
+        }
+
+        .progress-text {
+            display: flex;
+            justify-content: space-between;
+            color: #888;
+            font-size: 0.9rem;
+        }
+
+        .scan-results {
+            display: none;
+            margin-top: 1.5rem;
+        }
+
+        .scan-results.active {
+            display: block;
+        }
+
+        .result-item {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+            padding: 1rem;
+            background: rgba(0, 0, 0, 0.2);
+            border-radius: 8px;
+            margin-bottom: 0.5rem;
+        }
+
+        .result-icon {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.2rem;
+        }
+
+        .result-icon.success {
+            background: rgba(0, 255, 136, 0.2);
+            color: #00ff88;
+        }
+
+        .result-icon.warning {
+            background: rgba(255, 170, 0, 0.2);
+            color: #ffaa00;
+        }
+
+        .result-icon.error {
+            background: rgba(255, 68, 68, 0.2);
+            color: #ff4444;
+        }
+
+        /* Hidden */
+        .hidden {
+            display: none !important;
+        }
+
+        /* Toast Notifications */
+        .toast-container {
+            position: fixed;
+            top: 100px;
+            right: 20px;
+            z-index: 3000;
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+        }
+
+        .toast {
+            background: rgba(20, 20, 30, 0.95);
+            border: 1px solid rgba(0, 255, 136, 0.3);
+            border-radius: 8px;
+            padding: 1rem 1.5rem;
+            min-width: 300px;
+            animation: slideIn 0.3s ease;
+        }
+
+        @keyframes slideIn {
+            from { transform: translateX(100%); opacity: 0; }
+            to { transform: translateX(0); opacity: 1; }
+        }
+
+        .toast-title {
+            font-weight: bold;
+            margin-bottom: 0.3rem;
+        }
+
+        .toast.success .toast-title { color: #00ff88; }
+        .toast.error .toast-title { color: #ff4444; }
+        .toast.warning .toast-title { color: #ffaa00; }
+
+        .toast-message {
+            color: #aaa;
+            font-size: 0.9rem;
+        }
+
+        /* Responsive */
+        @media (max-width: 768px) {
+            .nav-links { display: none; }
+            .stats-grid { grid-template-columns: 1fr; }
+            .pricing-grid { grid-template-columns: 1fr; }
+            .pricing-card.featured { transform: none; }
+            .scanner-input-group { flex-direction: column; }
+        }
+    </style>
+</head>
+<body>
+    <div class="bg-grid"></div>
+    <div class="particles" id="particles"></div>
+
+    <!-- Header -->
+    <header class="header" id="header">
+        <a href="#" class="logo" onclick="showPage('home')">
+            <div class="logo-icon">⚡</div>
+            <span>ShieldCore</span>
+        </a>
+        
+        <nav class="nav-links" id="nav-links">
+            <a href="#" onclick="showPage('scanner')">Сканер</a>
+            <a href="#" onclick="showPage('pricing')">Тарифы</a>
+            <a href="#" onclick="showPage('dashboard')">Мои проекты</a>
+        </nav>
+
+        <div class="user-menu" id="user-menu">
+            <button class="btn btn-outline" onclick="showPage('login')">Вход</button>
+            <button class="btn btn-primary" onclick="showPage('register')">Регистрация</button>
+        </div>
+
+        <div class="user-menu hidden" id="logged-in-menu">
+            <span class="balance" id="user-balance">Баланс: $0.00</span>
+            <span id="user-name" style="color: #00ff88;"></span>
+            <button class="btn btn-outline" onclick="logout()">Выход</button>
+        </div>
+    </header>
+
+    <!-- Main Content -->
+    <main class="main-content" id="main-content">
+        
+        <!-- Home Page -->
+        <div id="page-home" class="page">
+            <div style="text-align: center; padding: 4rem 0;">
+                <h1 style="font-size: 3.5rem; margin-bottom: 1rem; background: linear-gradient(135deg, #00ff88, #00ccff); -webkit-background-clip: text; -webkit-text-fill-color: transparent;">
+                    Мощная защита сайтов
+                </h1>
+                <p style="color: #888; font-size: 1.2rem; max-width: 600px; margin: 0 auto 2rem;">
+                    AI-сканер уязвимостей, антиспам и комплексная безопасность для ваших веб-проектов
+                </p>
+                <div style="display: flex; gap: 1rem; justify-content: center;">
+                    <button class="btn btn-primary" onclick="showPage('register')" style="padding: 1rem 2rem; font-size: 1.1rem;">
+                        Начать бесплатно
+                    </button>
+                    <button class="btn btn-outline" onclick="showPage('scanner')" style="padding: 1rem 2rem; font-size: 1.1rem;">
+                        Демо сканирование
+                    </button>
+                </div>
+            </div>
+
+            <div class="stats-grid" style="margin-top: 4rem;">
+                <div class="stat-card">
+                    <div class="stat-label">Защищено сайтов</div>
+                    <div class="stat-value">12,847</div>
+                    <div class="stat-change">+156 сегодня</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-label">Найдено угроз</div>
+                    <div class="stat-value">45,231</div>
+                    <div class="stat-change">Исправлено автоматически</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-label">Аптайм системы</div>
+                    <div class="stat-value">99.99%</div>
+                    <div class="stat-change">За последние 30 дней</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Login Page -->
+        <div id="page-login" class="page hidden">
+            <div class="auth-container">
+                <div class="auth-box">
+                    <h2 class="auth-title">Вход в систему</h2>
+                    <p class="auth-subtitle">Введите ваши данные для доступа</p>
+                    
+                    <form onsubmit="handleLogin(event)">
+                        <div class="form-group">
+                            <label>Email</label>
+                            <input type="email" id="login-email" placeholder="you@example.com" required>
+                            <span class="error-message" id="login-email-error">Неверный email или пароль</span>
+                        </div>
+                        
+                        <div class="form-group">
+                            <label>Пароль</label>
+                            <input type="password" id="login-password" placeholder="••••••••" required>
+                        </div>
+                        
+                        <button type="submit" class="btn btn-primary" style="width: 100%; padding: 1rem;">
+                            Войти
+                        </button>
+                    </form>
+                    
+                    <div class="auth-footer">
+                        Нет аккаунта? <a href="#" onclick="showPage('register')">Зарегистрироваться</a>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Register Page -->
+        <div id="page-register" class="page hidden">
+            <div class="auth-container">
+                <div class="auth-box">
+                    <h2 class="auth-title">Создать аккаунт</h2>
+                    <p class="auth-subtitle">Начните защищать свои проекты</p>
+                    
+                    <form onsubmit="handleRegister(event)">
+                        <div class="form-group">
+                            <label>Имя</label>
+                            <input type="text" id="reg-name" placeholder="Иван Иванов" required>
+                        </div>
+                        
+                        <div class="form-group">
+                            <label>Email</label>
+                            <input type="email" id="reg-email" placeholder="you@example.com" required>
+                            <span class="error-message" id="reg-email-error">Email уже используется</span>
+                        </div>
+                        
+                        <div class="form-group">
+                            <label>Пароль</label>
+                            <input type="password" id="reg-password" placeholder="Минимум 6 символов" required minlength="6">
+                        </div>
+                        
+                        <button type="submit" class="btn btn-primary" style="width: 100%; padding: 1rem;">
+                            Создать аккаунт
+                        </button>
+                    </form>
+                    
+                    <div class="auth-footer">
+                        Уже есть аккаунт? <a href="#" onclick="showPage('login')">Войти</a>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Dashboard Page -->
+        <div id="page-dashboard" class="page hidden">
+            <div class="dashboard-header">
+                <h1>Личный кабинет</h1>
+                <p>Управление проектами и статистика</p>
+            </div>
+
+            <div class="stats-grid">
+                <div class="stat-card">
+                    <div class="stat-label">Ваши проекты</div>
+                    <div class="stat-value" id="dash-projects">0</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-label">Проверок выполнено</div>
+                    <div class="stat-value" id="dash-scans">0</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-label">Угроз найдено</div>
+                    <div class="stat-value" id="dash-threats" style="color: #ffaa00;">0</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-label">Тариф</div>
+                    <div class="stat-value" id="dash-plan" style="font-size: 1.5rem;">Бесплатный</div>
+                </div>
+            </div>
+
+            <div class="section">
+                <div class="section-header">
+                    <h3 class="section-title">Мои проекты</h3>
+                    <button class="btn btn-primary" onclick="showAddProjectModal()">+ Добавить проект</button>
+                </div>
+                <div class="projects-grid" id="projects-list">
+                    <p style="color: #666; text-align: center; grid-column: 1/-1; padding: 3rem;">
+                        У вас пока нет проектов. <a href="#" onclick="showAddProjectModal()" style="color: #00ff88;">Добавить первый</a>
+                    </p>
+                </div>
+            </div>
+        </div>
+
+        <!-- Scanner Page -->
+        <div id="page-scanner" class="page hidden">
+            <div class="dashboard-header">
+                <h1>Сканер безопасности</h1>
+                <p>Проверьте сайт на уязвимости</p>
+            </div>
+
+            <div class="scanner-container">
+                <div class="scanner-input-group">
+                    <input type="url" class="scanner-input" id="scan-url" placeholder="https://example.com">
+                    <select class="scanner-input" id="scan-level" style="max-width: 200px;">
+                        <option value="free">Бесплатная проверка</option>
+                        <option value="pro">Pro ($2.80)</option>
+                        <option value="super">Super ($30.00)</option>
+                    </select>
+                    <button class="btn btn-primary" onclick="startScan()">Сканировать</button>
+                </div>
+
+                <div class="scanner-progress" id="scanner-progress">
+                    <div class="progress-bar">
+                        <div class="progress-fill" id="progress-fill"></div>
+                    </div>
+                    <div class="progress-text">
+                        <span id="scan-status">Подключение...</span>
+                        <span id="scan-percent">0%</span>
+                    </div>
+                </div>
+
+                <div class="scan-results" id="scan-results">
+                    <h3 style="margin-bottom: 1rem; color: #00ff88;">Результаты сканирования</h3>
+                    <div id="results-list"></div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Pricing Page -->
+        <div id="page-pricing" class="page hidden">
+            <div style="text-align: center; margin-bottom: 3rem;">
+                <h1 style="font-size: 2.5rem; margin-bottom: 1rem;">Выберите уровень защиты</h1>
+                <p style="color: #888;">От базовой проверки до комплексного аудита безопасности</p>
+            </div>
+
+            <div class="pricing-grid">
+                <div class="pricing-card">
+                    <div class="pricing-name">Базовый</div>
+                    <div class="pricing-price">$0<span>/скан</span></div>
+                    <div class="pricing-description">Быстрая проверка основных уязвимостей</div>
+                    <ul class="pricing-features">
+                        <li>Проверка SSL</li>
+                        <li>Базовый XSS скан</li>
+                        <li>Проверка заголовков</li>
+                        <li class="disabled">Глубокий анализ</li>
+                        <li class="disabled">AI исправление</li>
+                        <li class="disabled">Отчет PDF</li>
+                    </ul>
+                    <button class="btn btn-outline" style="width: 100%;" onclick="selectPlan('free')">Выбрать</button>
+                </div>
+
+                <div class="pricing-card featured">
+                    <div class="pricing-badge">POPULAR</div>
+                    <div class="pricing-name">Pro</div>
+                    <div class="pricing-price">$2.80<span>/скан</span></div>
+                    <div class="pricing-description">Профессиональный анализ с AI рекомендациями</div>
+                    <ul class="pricing-features">
+                        <li>Все функции Base</li>
+                        <li>Глубокий анализ кода</li>
+                        <li>AI рекомендации</li>
+                        <li>Проверка 50+ уязвимостей</li>
+                        <li>PDF отчет</li>
+                        <li class="disabled">Исправление кода</li>
+                    </ul>
+                    <button class="btn btn-primary" style="width: 100%;" onclick="showPaymentModal('pro', 2.80)">Оплатить $2.80</button>
+                </div>
+
+                <div class="pricing-card">
+                    <div class="pricing-name">Super</div>
+                    <div class="pricing-price">$30<span>/скан</span></div>
+                    <div class="pricing-description">Полный аудит с автоматическим исправлением</div>
+                    <ul class="pricing-features">
+                        <li>Все функции Pro</li>
+                        <li>Ручной аудит экспертом</li>
+                        <li>Автоисправление багов</li>
+                        <li>Пентестинг</li>
+                        <li>Приоритетная поддержка</li>
+                        <li>Гарантия безопасности</li>
+                    </ul>
+                    <button class="btn btn-primary" style="width: 100%; background: linear-gradient(135deg, #aa66ff, #00ccff);" onclick="showPaymentModal('super', 30)">Оплатить $30</button>
+                </div>
+            </div>
+        </div>
+
+    </main>
+
+    <!-- Payment Modal -->
+    <div class="modal-overlay" id="payment-modal">
+        <div class="modal">
+            <div class="modal-header">
+                <h3 class="modal-title">Оплата проверки</h3>
+                <button class="modal-close" onclick="closePaymentModal()">×</button>
+            </div>
+            <div class="modal-body">
+                <div style="text-align: center; margin-bottom: 1.5rem;">
+                    <div style="font-size: 2rem; color: #00ff88; margin-bottom: 0.5rem;" id="payment-amount">$2.80</div>
+                    <div style="color: #888;" id="payment-plan">Pro проверка</div>
+                </div>
+
+                <div class="offer-box">
+                    <h4>⚠️ Публичная оферта</h4>
+                    <p>Настоящим я подтверждаю, что:</p>
+                    <ul>
+                        <li>Ознакомлен с условиями оказания услуг</li>
+                        <li>Понимаю, что после оплаты денежные средства <strong>не подлежат возврату</strong></li>
+                        <li>Услуга оказывается в автоматическом режиме немедленно после оплаты</li>
+                        <li>Я несу полную ответственность за последствия использования результатов проверки</li>
+                        <li>Исполнитель не несет ответственности за возможные сбои в работе сайта после применения рекомендаций</li>
+                        <li>Все действия я совершаю на свой страх и риск</li>
+                    </ul>
+                    <p style="margin-top: 1rem; color: #ffaa00; font-weight: bold;">
+                        Нажимая кнопку оплаты, вы безоговорочно принимаете все условия настоящего соглашения.
+                    </p>
+                </div>
+
+                <div class="checkbox-group">
+                    <input type="checkbox" id="offer-accept" onchange="togglePaymentButton()">
+                    <label for="offer-accept">
+                        Я прочитал и принимаю условия публичной оферты. 
+                        Подтверждаю, что оплата производится на мой страх и риск, 
+                        возврат средств <strong>невозможен</strong>.
+                    </label>
+                </div>
+
+                <div class="form-group" style="margin-top: 1.5rem;">
+                    <label>Email для чека</label>
+                    <input type="email" id="payment-email" placeholder="you@example.com">
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button class="btn btn-outline" onclick="closePaymentModal()">Отмена</button>
+                <button class="btn btn-primary" id="payment-btn" onclick="processPayment()" disabled>
+                    Перейти к оплате
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Add Project Modal -->
+    <div class="modal-overlay" id="project-modal">
+        <div class="modal" style="max-width: 500px;">
+            <div class="modal-header">
+                <h3 class="modal-title">Добавить проект</h3>
+                <button class="modal-close" onclick="closeProjectModal()">×</button>
+            </div>
+            <div class="modal-body">
+                <div class="form-group">
+                    <label>Название проекта</label>
+                    <input type="text" id="project-name" placeholder="Мой сайт">
+                </div>
+                <div class="form-group">
+                    <label>URL сайта</label>
+                    <input type="url" id="project-url" placeholder="https://example.com">
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button class="btn btn-outline" onclick="closeProjectModal()">Отмена</button>
+                <button class="btn btn-primary" onclick="addProject()">Добавить</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Toast Container -->
+    <div class="toast-container" id="toast-container"></div>
+
+    <script>
+        // State
+        let currentUser = null;
+        let currentPlan = 'free';
+        let paymentAmount = 0;
+        let projects = [];
+
+        // Initialize
+        document.addEventListener('DOMContentLoaded', () => {
+            createParticles();
+            checkAuth();
+        });
+
+        function createParticles() {
+            const container = document.getElementById('particles');
+            for (let i = 0; i < 50; i++) {
+                const particle = document.createElement('div');
+                particle.className = 'particle';
+                particle.style.left = Math.random() * 100 + '%';
+                particle.style.animationDelay = Math.random() * 10 + 's';
+                particle.style.animationDuration = (10 + Math.random() * 10) + 's';
+                container.appendChild(particle);
+            }
+        }
+
+        // Navigation
+        function showPage(page) {
+            // Hide all pages
+            document.querySelectorAll('.page').forEach(p => p.classList.add('hidden'));
+            
+            // Show requested page
+            const targetPage = document.getElementById(`page-${page}`);
+            if (targetPage) {
+                targetPage.classList.remove('hidden');
+            }
+
+            // Update nav active state
+            document.querySelectorAll('.nav-links a').forEach(link => {
+                link.style.color = '#888';
+            });
+
+            // Check auth for protected pages
+            if ((page === 'dashboard' || page === 'scanner') && !currentUser) {
+                showPage('login');
+                showToast('Требуется авторизация', 'error');
+                return;
+            }
+
+            window.scrollTo(0, 0);
+        }
+
+        // Auth Functions
+        function handleRegister(e) {
+            e.preventDefault();
+            
+            const name = document.getElementById('reg-name').value;
+            const email = document.getElementById('reg-email').value;
+            const password = document.getElementById('reg-password').value;
+
+            // Check if user exists
+            const users = JSON.parse(localStorage.getItem('shieldcore_users') || '[]');
+            if (users.find(u => u.email === email)) {
+                document.getElementById('reg-email').classList.add('error');
+                document.getElementById('reg-email-error').style.display = 'block';
+                return;
+            }
+
+            // Create user
+            const user = {
+                id: Date.now(),
+                name,
+                email,
+                password, // In real app, hash this!
+                balance: 0,
+                plan: 'free',
+                scans: 0,
+                projects: []
+            };
+
+            users.push(user);
+            localStorage.setItem('shieldcore_users', JSON.stringify(users));
+            
+            showToast('Регистрация успешна!', 'success');
+            loginUser(user);
+        }
+
+        function handleLogin(e) {
+            e.preventDefault();
+            
+            const email = document.getElementById('login-email').value;
+            const password = document.getElementById('login-password').value;
+
+            const users = JSON.parse(localStorage.getItem('shieldcore_users') || '[]');
+            const user = users.find(u => u.email === email && u.password === password);
+
+            if (!user) {
+                document.getElementById('login-email').classList.add('error');
+                document.getElementById('login-password').classList.add('error');
+                document.getElementById('login-email-error').style.display = 'block';
+                return;
+            }
+
+            loginUser(user);
+        }
+
+        function loginUser(user) {
+            currentUser = user;
+            localStorage.setItem('shieldcore_current_user', JSON.stringify(user));
+            
+            updateUI();
+            showToast(`Добро пожаловать, ${user.name}!`, 'success');
+            showPage('dashboard');
+        }
+
+        function logout() {
+            currentUser = null;
+            localStorage.removeItem('shieldcore_current_user');
+            updateUI();
+            showToast('Вы вышли из системы', 'info');
+            showPage('home');
+        }
+
+        function checkAuth() {
+            const saved = localStorage.getItem('shieldcore_current_user');
+            if (saved) {
+                currentUser = JSON.parse(saved);
+                updateUI();
+            }
+        }
+
+        function updateUI() {
+            const guestMenu = document.getElementById('user-menu');
+            const userMenu = document.getElementById('logged-in-menu');
+            
+            if (currentUser) {
+                guestMenu.classList.add('hidden');
+                userMenu.classList.remove('hidden');
+                document.getElementById('user-name').textContent = currentUser.name;
+                updateBalance();
+                loadProjects();
+            } else {
+                guestMenu.classList.remove('hidden');
+                userMenu.classList.add('hidden');
+            }
+        }
+
+        function updateBalance() {
+            if (currentUser) {
+                document.getElementById('user-balance').textContent = `Баланс: $${currentUser.balance.toFixed(2)}`;
+                document.getElementById('dash-plan').textContent = 
+                    currentUser.plan === 'free' ? 'Бесплатный' : 
+                    currentUser.plan === 'pro' ? 'Pro' : 'Super';
+            }
+        }
+
+        // Projects
+        function loadProjects() {
+            if (!currentUser) return;
+            
+            const container = document.getElementById('projects-list');
+            const userProjects = currentUser.projects || [];
+            
+            document.getElementById('dash-projects').textContent = userProjects.length;
+            document.getElementById('dash-scans').textContent = currentUser.scans || 0;
+
+            if (userProjects.length === 0) {
+                container.innerHTML = `
+                    <p style="color: #666; text-align: center; grid-column: 1/-1; padding: 3rem;">
+                        У вас пока нет проектов. <a href="#" onclick="showAddProjectModal()" style="color: #00ff88;">Добавить первый</a>
+                    </p>
+                `;
+                return;
+            }
+
+            container.innerHTML = userProjects.map(project => `
+                <div class="project-card">
+                    <div class="project-header">
+                        <div>
+                            <div class="project-name">${project.name}</div>
+                            <div class="project-url">${project.url}</div>
+                        </div>
+                        <span class="project-status status-secure">Защищен</span>
+                    </div>
+                    <div class="project-stats">
+                        <div class="project-stat">
+                            <div class="project-stat-value">0</div>
+                            <div class="project-stat-label">Угроз</div>
+                        </div>
+                        <div class="project-stat">
+                            <div class="project-stat-value">${project.scans || 0}</div>
+                            <div class="project-stat-label">Проверок</div>
+                        </div>
+                        <div class="project-stat">
+                            <div class="project-stat-value">${project.lastScan || 'Никогда'}</div>
+                            <div class="project-stat-label">Последняя</div>
+                        </div>
+                    </div>
+                </div>
+            `).join('');
+        }
+
+        function showAddProjectModal() {
+            document.getElementById('project-modal').classList.add('active');
+        }
+
+        function closeProjectModal() {
+            document.getElementById('project-modal').classList.remove('active');
+        }
+
+        function addProject() {
+            const name = document.getElementById('project-name').value;
+            const url = document.getElementById('project-url').value;
+
+            if (!name || !url) {
+                showToast('Заполните все поля', 'error');
+                return;
+            }
+
+            const project = {
+                id: Date.now(),
+                name,
+                url,
+                scans: 0,
+                lastScan: null
+            };
+
+            currentUser.projects = currentUser.projects || [];
+            currentUser.projects.push(project);
+            
+            saveUser();
+            loadProjects();
+            closeProjectModal();
+            showToast('Проект добавлен!', 'success');
+        }
+
+        // Scanner
+        function startScan() {
+            const url = document.getElementById('scan-url').value;
+            const level = document.getElementById('scan-level').value;
+
+            if (!url) {
+                showToast('Введите URL для сканирования', 'error');
+                return;
+            }
+
+            // Check if paid scan selected
+            if (level !== 'free' && !currentUser) {
+                showToast('Для оплаты требуется авторизация', 'error');
+                showPage('login');
+                return;
+            }
+
+            if (level === 'pro' && currentUser.balance < 2.80) {
+                showToast('Недостаточно средств. Пополните баланс.', 'error');
+                return;
+            }
+
+            if (level === 'super' && currentUser.balance < 30) {
+                showToast('Недостаточно средств. Пополните баланс.', 'error');
+                return;
+            }
+
+            // Deduct balance for paid scans
+            if (level === 'pro') {
+                currentUser.balance -= 2.80;
+                currentUser.scans = (currentUser.scans || 0) + 1;
+                saveUser();
+                updateBalance();
+            } else if (level === 'super') {
+                currentUser.balance -= 30;
+                currentUser.scans = (currentUser.scans || 0) + 1;
+                saveUser();
+                updateBalance();
+            }
+
+            // Show progress
+            const progressDiv = document.getElementById('scanner-progress');
+            const resultsDiv = document.getElementById('scan-results');
+            const fill = document.getElementById('progress-fill');
+            
+            progressDiv.classList.add('active');
+            resultsDiv.classList.remove('active');
+            
+            let progress = 0;
+            const interval = setInterval(() => {
+                progress += Math.random() * 15;
+                if (progress > 100) progress = 100;
+                
+                fill.style.width = progress + '%';
+                document.getElementById('scan-percent').textContent = Math.floor(progress) + '%';
+                
+                if (progress < 30) document.getElementById('scan-status').textContent = 'Проверка DNS...';
+                else if (progress < 60) document.getElementById('scan-status').textContent = 'Анализ SSL...';
+                else if (progress < 90) document.getElementById('scan-status').textContent = 'Поиск уязвимостей...';
+                else document.getElementById('scan-status').textContent = 'Финальная проверка...';
+                
+                if (progress === 100) {
+                    clearInterval(interval);
+                    setTimeout(() => showScanResults(level), 500);
+                }
+            }, 300);
+        }
+
+        function showScanResults(level) {
+            document.getElementById('scanner-progress').classList.remove('active');
+            document.getElementById('scan-results').classList.add('active');
+            
+            const resultsList = document.getElementById('results-list');
+            const checks = [
+                { name: 'SSL Сертификат', status: 'success', msg: 'Действителен' },
+                { name: 'XSS Уязвимости', status: level === 'free' ? 'warning' : 'success', msg: level === 'free' ? 'Требуется глубокий анализ' : 'Не обнаружено' },
+                { name: 'SQL Injection', status: 'success', msg: 'Защищено' },
+                { name: 'CSRF Токены', status: level === 'free' ? 'warning' : 'success', msg: level === 'free' ? 'Частичная проверка' : 'Настроены корректно' },
+                { name: 'Заголовки безопасности', status: level === 'super' ? 'success' : 'warning', msg: level === 'super' ? 'Все заголовки оптимальны' : 'Рекомендуется настройка' }
+            ];
+
+            if (level === 'super') {
+                checks.push(
+                    { name: 'Конфигурация сервера', status: 'success', msg: 'Оптимизировано' },
+                    { name: 'Утечки данных', status: 'success', msg: 'Не обнаружено' },
+                    { name: 'Права доступа', status: 'success', msg: 'Настроены строго' }
+                );
+            }
+
+            resultsList.innerHTML = checks.map(check => `
+                <div class="result-item">
+                    <div class="result-icon ${check.status}">
+                        ${check.status === 'success' ? '✓' : check.status === 'warning' ? '!' : '✗'}
+                    </div>
+                    <div style="flex: 1;">
+                        <div style="font-weight: bold; margin-bottom: 0.2rem;">${check.name}</div>
+                        <div style="color: #888; font-size: 0.9rem;">${check.msg}</div>
+                    </div>
+                </div>
+            `).join('');
+
+            showToast('Сканирование завершено!', 'success');
+        }
+
+        // Payment
+        function showPaymentModal(plan, amount) {
+            if (!currentUser) {
+                showToast('Для оплаты требуется авторизация', 'error');
+                showPage('login');
+                return;
+            }
+
+            currentPlan = plan;
+            paymentAmount = amount;
+            
+            document.getElementById('payment-amount').textContent = `$${amount.toFixed(2)}`;
+            document.getElementById('payment-plan').textContent = 
+                plan === 'pro' ? 'Pro проверка' : 'Super проверка';
+            document.getElementById('payment-email').value = currentUser.email;
+            document.getElementById('offer-accept').checked = false;
+            document.getElementById('payment-btn').disabled = true;
+            
+            document.getElementById('payment-modal').classList.add('active');
+        }
+
+        function closePaymentModal() {
+            document.getElementById('payment-modal').classList.remove('active');
+        }
+
+        function togglePaymentButton() {
+            const checked = document.getElementById('offer-accept').checked;
+            document.getElementById('payment-btn').disabled = !checked;
+        }
+
+        function processPayment() {
+            // Simulate payment processing
+            const btn = document.getElementById('payment-btn');
+            btn.textContent = 'Обработка...';
+            btn.disabled = true;
+
+            setTimeout(() => {
+                // Add to balance (simulation)
+                currentUser.balance += paymentAmount; // In real app, this would be after actual payment
+                currentUser.plan = currentPlan;
+                saveUser();
+                updateBalance();
+                
+                closePaymentModal();
+                showToast(`Оплата $${paymentAmount.toFixed(2)} успешна!`, 'success');
+                
+                btn.textContent = 'Перейти к оплате';
+                
+                // Redirect to scanner
+                showPage('scanner');
+            }, 2000);
+        }
+
+        function selectPlan(plan) {
+            showPage('scanner');
+            document.getElementById('scan-level').value = plan;
+        }
+
+        // Utilities
+        function saveUser() {
+            const users = JSON.parse(localStorage.getItem('shieldcore_users') || '[]');
+            const index = users.findIndex(u => u.id === currentUser.id);
+            if (index !== -1) {
+                users[index] = currentUser;
+                localStorage.setItem('shieldcore_users', JSON.stringify(users));
+                localStorage.setItem('shieldcore_current_user', JSON.stringify(currentUser));
+            }
+        }
+
+        function showToast(message, type = 'info') {
+            const container = document.getElementById('toast-container');
+            const toast = document.createElement('div');
+            toast.className = `toast ${type}`;
+            
+            const titles = {
+                success: 'Успешно',
+                error: 'Ошибка',
+                warning: 'Внимание',
+                info: 'Информация'
+            };
+
+            toast.innerHTML = `
+                <div class="toast-title">${titles[type]}</div>
+                <div class="toast-message">${message}</div>
+            `;
+            
+            container.appendChild(toast);
+            
+            setTimeout(() => {
+                toast.style.opacity = '0';
+                toast.style.transform = 'translateX(100%)';
+                setTimeout(() => toast.remove(), 300);
+            }, 3000);
+        }
+
+        // Input validation
+        document.querySelectorAll('input').forEach(input => {
+            input.addEventListener('input', function() {
+                this.classList.remove('error');
+                const errorMsg = this.parentElement.querySelector('.error-message');
+                if (errorMsg) errorMsg.style.display = 'none';
+            });
+        });
+    </script>
+</body>
+</html>
